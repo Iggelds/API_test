@@ -4,6 +4,10 @@ public class Pet {
     private long id;
     private String name;
 
+    public Pet(String name) {
+        this.name = name;
+    }
+
     public long getId() {
         return id;
     }
