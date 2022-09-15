@@ -14,29 +14,70 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 public class PetTest {
 
-    private final String baseUrl = "https://petstore.swagger.io/v2/";
+    private final String BASE_URL = "https://petstore.swagger.io/v2/";
 
     @Test
-    public void createPetTest() {
+    public void postPetTest() {
         Pet exptectedPet = new Pet("Toby");
 
         Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
-                .when().post(baseUrl + "pet");
+                .when().post(BASE_URL + "pet");
 
         Pet pet = response.jsonPath().getObject("", Pet.class);
         Assert.assertTrue(pet.getId() > 0, "Expected id exists");
         Assert.assertEquals(pet.getName(), "Toby", "Expected valid name");
     }
+    @Test
+    public void postWithFormPetTest() {
+        Pet pet = new Pet("Toby");
 
+        Response response = request().body(pet).expect().statusCode(SC_OK)
+                .when().post(BASE_URL + "pet");
+
+        Pet createdPet = response.jsonPath().getObject("", Pet.class);
+
+        RequestSpecification requestSpecification = request().header("Accept", "application/x-www-form-urlencoded");
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "Barsik");
+        params.put("petId", String.valueOf(createdPet.getId()));
+
+        response = requestSpecification.formParams(params).expect().statusCode(SC_OK)
+                .when().post(BASE_URL + "pet/" + createdPet.getId());
+        Pet pet2 = response.jsonPath().getObject("", Pet.class);
+        Assert.assertTrue(pet2.getId() > 0, "Expected id exists");
+        Assert.assertEquals(pet2.getName(), "Barsik", "Expected valid name");
+    }
+    @Test
+    public void postWithImagePetTest() {
+        Pet exptectedPet = new Pet("Toby");
+
+        Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
+                .when().post(BASE_URL + "pet");
+        Pet pet = response.jsonPath().getObject("", Pet.class);
+    }
+    @Test
+    public void putPetTest() {
+        Pet pet = new Pet("Toby");
+
+        Response response = request().body(pet).expect().statusCode(SC_OK)
+                .when().post(BASE_URL + "pet");
+
+        Pet createdPet = response.jsonPath().getObject("", Pet.class);
+        createdPet.setName("Barsik");
+        response = request().body(createdPet).expect().statusCode(SC_OK)
+                .when().put(BASE_URL + "pet");
+        Pet pet2 = response.jsonPath().getObject("", Pet.class);
+        Assert.assertEquals(pet2.getName(), "Barsik", "Expected valid name");
+    }
     @Test
     public void deletePetTest() {
         Pet exptectedPet = new Pet("Toby");
 
         Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
-                .when().post(baseUrl + "pet");
+                .when().post(BASE_URL + "pet");
 
         Pet pet = response.jsonPath().getObject("", Pet.class);
-        String petUrl = baseUrl + "pet/" + pet.getId();
+        String petUrl = BASE_URL + "pet/" + pet.getId();
         request().when().delete(petUrl).then().statusCode(SC_OK);
         request().when().get(petUrl).then().statusCode(SC_NOT_FOUND);
     }
@@ -46,7 +87,7 @@ public class PetTest {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept", "application/json");
         headers.put("Content-Type", "application/json");
-        headers.put("api-key", "application/json");
+        headers.put("api-key", "key");
         return requestSpecification.headers(headers);
     }
 }
