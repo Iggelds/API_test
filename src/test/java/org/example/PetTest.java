@@ -19,14 +19,14 @@ public class PetTest {
 
     @Test
     public void postPetTest() {
-        Pet exptectedPet = new Pet("Toby");
+        Pet pet = new Pet("Toby");
 
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
+        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
-        Pet pet = response.jsonPath().getObject("", Pet.class);
-        Assert.assertTrue(pet.getId() > 0, "Expected id exists");
-        Assert.assertEquals(pet.getName(), "Toby", "Expected valid name");
+        Pet createdPet = response.jsonPath().getObject("", Pet.class);
+        Assert.assertTrue(createdPet.getId() > 0, "Expected id exists");
+        Assert.assertEquals(createdPet.getName(), "Toby", "Expected valid name");
     }
 
     @Test
@@ -52,15 +52,6 @@ public class PetTest {
     }
 
     @Test
-    public void postWithImagePetTest() {
-        Pet exptectedPet = new Pet("Toby");
-
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
-                .when().post(BASE_URL + "pet");
-        Pet pet = response.jsonPath().getObject("", Pet.class);
-    }
-
-    @Test
     public void putPetTest() {
         Pet pet = new Pet("Toby");
 
@@ -77,13 +68,13 @@ public class PetTest {
 
     @Test
     public void deletePetTest() {
-        Pet exptectedPet = new Pet("Toby");
+        Pet pet = new Pet("Toby");
 
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
+        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
-        Pet pet = response.jsonPath().getObject("", Pet.class);
-        String petUrl = BASE_URL + "pet/" + pet.getId();
+        Pet createdPet = response.jsonPath().getObject("", Pet.class);
+        String petUrl = BASE_URL + "pet/" + createdPet.getId();
         request().when().delete(petUrl).then().statusCode(SC_OK).log().ifError();
         request().when().get(petUrl).then().statusCode(SC_NOT_FOUND).log().ifError();
         Log.info("Response status code is " + response.statusCode());
@@ -98,4 +89,17 @@ public class PetTest {
         headers.put("api-key", "key");
         return requestSpecification.headers(headers);
     }
+//    @Test
+//    public void postWithImagePetTest() {
+//        Pet pet = new Pet("Toby");
+//
+//        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
+//                .when().post(BASE_URL + "pet");
+//        Pet createdPet = response.jsonPath().getObject("", Pet.class);
+//
+//        response = request().expect().statusCode(SC_OK).log().ifError()
+//                .when().get(BASE_URL + "pet/uploadImage");
+//        request().multiPart()
+//
+//    }
 }
