@@ -27,6 +27,7 @@ public class PetTest {
         Assert.assertTrue(pet.getId() > 0, "Expected id exists");
         Assert.assertEquals(pet.getName(), "Toby", "Expected valid name");
     }
+
     @Test
     public void postWithFormPetTest() {
         Pet pet = new Pet("Toby");
@@ -35,7 +36,6 @@ public class PetTest {
                 .when().post(BASE_URL + "pet");
 
         Pet createdPet = response.jsonPath().getObject("", Pet.class);
-
         RequestSpecification requestSpecification = request().header("Content-Type", "application/x-www-form-urlencoded");
         Map<String, String> params = new HashMap<>();
         params.put("name", "Barsik");
@@ -45,10 +45,11 @@ public class PetTest {
 
         response = request().expect().statusCode(SC_OK).
                 when().get(BASE_URL + "pet/" + createdPet.getId());
-        Pet pet2 = response.jsonPath().getObject("", Pet.class);
-        Assert.assertTrue(pet2.getId() > 0, "Expected id exists");
-        Assert.assertEquals(pet2.getName(), "Barsik", "Expected valid name");
+        Pet newPet = response.jsonPath().getObject("", Pet.class);
+        Assert.assertTrue(newPet.getId() > 0, "Expected id exists");
+        Assert.assertEquals(newPet.getName(), "Barsik", "Expected valid name");
     }
+
     @Test
     public void postWithImagePetTest() {
         Pet exptectedPet = new Pet("Toby");
@@ -57,6 +58,7 @@ public class PetTest {
                 .when().post(BASE_URL + "pet");
         Pet pet = response.jsonPath().getObject("", Pet.class);
     }
+
     @Test
     public void putPetTest() {
         Pet pet = new Pet("Toby");
@@ -68,9 +70,10 @@ public class PetTest {
         createdPet.setName("Barsik");
         response = request().body(createdPet).expect().statusCode(SC_OK)
                 .when().put(BASE_URL + "pet");
-        Pet pet2 = response.jsonPath().getObject("", Pet.class);
-        Assert.assertEquals(pet2.getName(), "Barsik", "Expected valid name");
+        Pet newPet = response.jsonPath().getObject("", Pet.class);
+        Assert.assertEquals(newPet.getName(), "Barsik", "Expected valid name");
     }
+
     @Test
     public void deletePetTest() {
         Pet exptectedPet = new Pet("Toby");

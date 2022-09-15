@@ -3,7 +3,6 @@ package org.example;
 public class Pet {
     private long id;
     private String name;
-    private String status;
     public Pet(String name) {
         this.name = name;
     }
@@ -24,11 +23,5 @@ public class Pet {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.name = status;
-    }
 }
