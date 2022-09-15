@@ -3,6 +3,7 @@ package org.example;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.example.log.Log;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -14,13 +15,13 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 public class PetTest {
 
-    private final String BASE_URL = "https://petstore.swagger.io/v2/";
+    private static final String BASE_URL = "https://petstore.swagger.io/v2/";
 
     @Test
     public void postPetTest() {
         Pet exptectedPet = new Pet("Toby");
 
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
+        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
         Pet pet = response.jsonPath().getObject("", Pet.class);
@@ -32,7 +33,7 @@ public class PetTest {
     public void postWithFormPetTest() {
         Pet pet = new Pet("Toby");
 
-        Response response = request().body(pet).expect().statusCode(SC_OK)
+        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
         Pet createdPet = response.jsonPath().getObject("", Pet.class);
@@ -40,11 +41,11 @@ public class PetTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "Barsik");
 
-        requestSpecification.formParams(params).expect().statusCode(SC_OK)
+        requestSpecification.formParams(params).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet/" + createdPet.getId());
 
-        response = request().expect().statusCode(SC_OK).
-                when().get(BASE_URL + "pet/" + createdPet.getId());
+        response = request().expect().statusCode(SC_OK).log().ifError()
+                .when().get(BASE_URL + "pet/" + createdPet.getId());
         Pet newPet = response.jsonPath().getObject("", Pet.class);
         Assert.assertTrue(newPet.getId() > 0, "Expected id exists");
         Assert.assertEquals(newPet.getName(), "Barsik", "Expected valid name");
@@ -54,7 +55,7 @@ public class PetTest {
     public void postWithImagePetTest() {
         Pet exptectedPet = new Pet("Toby");
 
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
+        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
         Pet pet = response.jsonPath().getObject("", Pet.class);
     }
@@ -63,12 +64,12 @@ public class PetTest {
     public void putPetTest() {
         Pet pet = new Pet("Toby");
 
-        Response response = request().body(pet).expect().statusCode(SC_OK)
+        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
         Pet createdPet = response.jsonPath().getObject("", Pet.class);
         createdPet.setName("Barsik");
-        response = request().body(createdPet).expect().statusCode(SC_OK)
+        response = request().body(createdPet).expect().statusCode(SC_OK).log().ifError()
                 .when().put(BASE_URL + "pet");
         Pet newPet = response.jsonPath().getObject("", Pet.class);
         Assert.assertEquals(newPet.getName(), "Barsik", "Expected valid name");
@@ -78,13 +79,15 @@ public class PetTest {
     public void deletePetTest() {
         Pet exptectedPet = new Pet("Toby");
 
-        Response response = request().body(exptectedPet).expect().statusCode(SC_OK)
+        Response response = request().body(exptectedPet).expect().statusCode(SC_OK).log().ifError()
                 .when().post(BASE_URL + "pet");
 
         Pet pet = response.jsonPath().getObject("", Pet.class);
         String petUrl = BASE_URL + "pet/" + pet.getId();
-        request().when().delete(petUrl).then().statusCode(SC_OK);
-        request().when().get(petUrl).then().statusCode(SC_NOT_FOUND);
+        request().when().delete(petUrl).then().statusCode(SC_OK).log().ifError();
+        request().when().get(petUrl).then().statusCode(SC_NOT_FOUND).log().ifError();
+        Log.info("Response status code is " + response.statusCode());
+        Log.info("Response body is " + response.asPrettyString());
     }
 
     private static RequestSpecification request() {
