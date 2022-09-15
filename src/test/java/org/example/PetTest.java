@@ -36,13 +36,15 @@ public class PetTest {
 
         Pet createdPet = response.jsonPath().getObject("", Pet.class);
 
-        RequestSpecification requestSpecification = request().header("Accept", "application/x-www-form-urlencoded");
+        RequestSpecification requestSpecification = request().header("Content-Type", "application/x-www-form-urlencoded");
         Map<String, String> params = new HashMap<>();
         params.put("name", "Barsik");
-        params.put("petId", String.valueOf(createdPet.getId()));
 
-        response = requestSpecification.formParams(params).expect().statusCode(SC_OK)
+        requestSpecification.formParams(params).expect().statusCode(SC_OK)
                 .when().post(BASE_URL + "pet/" + createdPet.getId());
+
+        response = request().expect().statusCode(SC_OK).
+                when().get(BASE_URL + "pet/" + createdPet.getId());
         Pet pet2 = response.jsonPath().getObject("", Pet.class);
         Assert.assertTrue(pet2.getId() > 0, "Expected id exists");
         Assert.assertEquals(pet2.getName(), "Barsik", "Expected valid name");
