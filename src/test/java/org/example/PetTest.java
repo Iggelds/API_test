@@ -89,17 +89,4 @@ public class PetTest {
         headers.put("api-key", "key");
         return requestSpecification.headers(headers);
     }
-//    @Test
-//    public void postWithImagePetTest() {
-//        Pet pet = new Pet("Toby");
-//
-//        Response response = request().body(pet).expect().statusCode(SC_OK).log().ifError()
-//                .when().post(BASE_URL + "pet");
-//        Pet createdPet = response.jsonPath().getObject("", Pet.class);
-//
-//        response = request().expect().statusCode(SC_OK).log().ifError()
-//                .when().get(BASE_URL + "pet/uploadImage");
-//        request().multiPart()
-//
-//    }
 }
